@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:09:42 by hoigag            #+#    #+#             */
-/*   Updated: 2023/04/20 18:13:28 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/04/21 21:47:41 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	*routine(void *data)
 	philo = (t_philo *) data;
 	if (philo->id % 2 == 0)
 		usleep(100);
-	while (philo->is_alive && !philo->is_full)
+	while (*philo->is_alive && !philo->is_full)
 	{
 		print("is thinking", philo);
 		pthread_mutex_lock(philo->left_fork);
@@ -28,6 +28,8 @@ void	*routine(void *data)
 		print("has taken a fork", philo);
 		print("is eating", philo);
 		philo->meal_counter++;
+		if (philo->meal_counter == philo->sim->number_of_times_to_eat)
+			philo->is_full = 1;
 		philo->last_meal = get_current_time();
 		philo_sleep(philo, philo->sim->time_to_eat);
 		pthread_mutex_unlock(philo->right_fork);
@@ -54,32 +56,30 @@ int	check_full(t_philo *philosophers, t_sim sim)
 	return (counter == sim.number_of_philos);
 }
 
-int	check_death(t_philo *philosophers, t_sim sim)
+int	check_death(t_philo *philo, int *finish)
+{
+	if (get_current_time() - philo->last_meal > philo->sim->time_to_die)
+	{
+		print("died", philo);
+		if (philo->sim->number_of_philos == 1)
+			pthread_mutex_unlock(philo->left_fork);
+		*finish = 0;
+		return (1);
+	}
+	return (0);
+}
+
+int	monitor(t_philo *philosophers, t_sim sim, int *finish)
 {
 	int	i;
-	int	j;
 
 	i = 0;
+	if (check_full(philosophers, sim))
+		return (1);
 	while (i < sim.number_of_philos)
 	{
-		if (philosophers[i].meal_counter == philosophers[i].sim->number_of_times_to_eat)
-			philosophers[i].is_full = 1;
-		if (check_full(philosophers, sim))
+		if (check_death(&philosophers[i], finish))
 			return (1);
-		if (get_current_time() - philosophers[i].last_meal > philosophers[i].sim->time_to_die)
-		{
-			print("died", &philosophers[i]);
-			if (sim.number_of_philos == 1)
-				pthread_mutex_unlock(philosophers[i].left_fork);
-			// philosophers[i].is_alive = 0;
-			j = 0;
-			while (j < sim.number_of_philos)
-			{
-				philosophers[j].is_alive = 0;
-				j++;
-			}
-			return (1);
-		}
 		i++;
 	}
 	return (0);
@@ -91,13 +91,15 @@ int	main(int argc, char **argv)
 	t_philo		*philosophers;
 	pthread_t	*philo_threads;
 	int			i;
+	int			finish;
 
+	finish = 1;
 	i = 0;
 	if (!check_args(argv + 1, argc - 1))
 		return (ERROR);
 	if (!init_sim(&sim, argv + 1, argc - 1))
 		return (ERROR);
-	philosophers = create_philosophers(&sim);
+	philosophers = create_philosophers(&sim, &finish);
 	if (!philosophers)
 	{
 		printf("could not create philosophers\n");
@@ -118,7 +120,7 @@ int	main(int argc, char **argv)
 	}
 	while (1)
 	{
-		if (check_death(philosophers, sim))
+		if (monitor(philosophers, sim, &finish))
 			break ;
 	}
 	i = 0;

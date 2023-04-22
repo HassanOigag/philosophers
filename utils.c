@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:20:45 by hoigag            #+#    #+#             */
-/*   Updated: 2023/04/20 18:21:32 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/04/21 18:23:40 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,19 +59,11 @@ time_to_die time_to_eat time_to_sleep \
 	return (1);
 }
 
-int	init_sim(t_sim *sim, char **argv, int argc)
+int	init_forks(t_sim *sim)
 {
 	int	i;
 
 	i = 0;
-	sim->number_of_philos = ft_atoi(argv[0]);
-	sim->time_to_die = ft_atoi(argv[1]);
-	sim->time_to_eat = ft_atoi(argv[2]);
-	sim->time_to_sleep = ft_atoi(argv[3]);
-	if (argc == 5)
-		sim->number_of_times_to_eat = ft_atoi(argv[4]);
-	else
-		sim->number_of_times_to_eat = -1;
 	if (pthread_mutex_init(&sim->print, NULL) != 0)
 	{
 		printf("Could not init mutex\n");
@@ -92,7 +84,25 @@ int	init_sim(t_sim *sim, char **argv, int argc)
 	return (1);
 }
 
-t_philo	*create_philosophers(t_sim *sim)
+int	init_sim(t_sim *sim, char **argv, int argc)
+{
+	int	i;
+
+	i = 0;
+	sim->number_of_philos = ft_atoi(argv[0]);
+	sim->time_to_die = ft_atoi(argv[1]);
+	sim->time_to_eat = ft_atoi(argv[2]);
+	sim->time_to_sleep = ft_atoi(argv[3]);
+	if (argc == 5)
+		sim->number_of_times_to_eat = ft_atoi(argv[4]);
+	else
+		sim->number_of_times_to_eat = -1;
+	if (!init_forks(sim))
+		return (0);
+	return (1);
+}
+
+t_philo	*create_philosophers(t_sim *sim, int *finish)
 {
 	t_philo	*philos;
 	int		i;
@@ -106,7 +116,7 @@ t_philo	*create_philosophers(t_sim *sim)
 	while (i < sim->number_of_philos)
 	{
 		philos[i].id = i;
-		philos[i].is_alive = 1;
+		philos[i].is_alive = finish;
 		philos[i].is_full = 0;
 		philos[i].meal_counter = 0;
 		philos[i].current_time = current_time;
