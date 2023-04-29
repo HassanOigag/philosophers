@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:00:01 by hoigag            #+#    #+#             */
-/*   Updated: 2023/04/21 18:23:52 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/04/29 10:55:57 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 
 # define ERROR 1
 
+typedef struct s_philo	t_philo;
+
 typedef struct s_sim
 {
 	int				number_of_philos;
@@ -31,6 +33,8 @@ typedef struct s_sim
 	long			time_to_sleep;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print;
+	t_philo			*philosophers;
+	pthread_t		*philo_threads;
 	pthread_mutex_t	eat;
 }	t_sim;
 
@@ -49,9 +53,13 @@ typedef struct s_philo
 
 long	ft_atoi(const char *str);
 int		check_args(char **argv, int argc);
-int		init_sim(t_sim *sim, char **argv, int argc);
+int		init_sim(t_sim *sim, char **argv, int argc, int *finish);
 long	get_current_time(void);
-t_philo	*create_philosophers(t_sim *sim, int *finish);
 void	philo_sleep(t_philo	*philo, long time);
 void	print(char *message, t_philo *philo);
+void	*routine(void *data);
+int		monitor(t_sim *sim, int *finish);
+int		destroy_mutexes(t_sim *sim);
+int		join_and_free(t_sim *sim);
+
 #endif

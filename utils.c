@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:20:45 by hoigag            #+#    #+#             */
-/*   Updated: 2023/04/24 10:03:16 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/04/29 17:36:08 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,72 +59,36 @@ time_to_die time_to_eat time_to_sleep \
 	return (1);
 }
 
-int	init_forks(t_sim *sim)
+long	get_current_time(void)
 {
-	int	i;
+	struct timeval	tv;
 
-	i = 0;
-	if (pthread_mutex_init(&sim->print, NULL) != 0)
-	{
-		printf("Could not init mutex\n");
-		return (0);
-	}
-	sim->forks = malloc(sizeof(pthread_mutex_t) * sim->number_of_philos);
-	if (!sim->forks)
-		return (0);
-	while (i < sim->number_of_philos)
-	{
-		if (pthread_mutex_init(&sim->forks[i], NULL) != 0)
-		{
-			printf("Could not init mutex\n");
-			return (0);
-		}
-		i++;
-	}
-	return (1);
+	if (gettimeofday(&tv, 0) == 0)
+		return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+	return (0);
 }
 
-int	init_sim(t_sim *sim, char **argv, int argc)
+void	philo_sleep(t_philo	*philo, long time)
 {
-	int	i;
+	long	start;
 
-	i = 0;
-	sim->number_of_philos = ft_atoi(argv[0]);
-	sim->time_to_die = ft_atoi(argv[1]);
-	sim->time_to_eat = ft_atoi(argv[2]);
-	sim->time_to_sleep = ft_atoi(argv[3]);
-	if (argc == 5)
-		sim->number_of_times_to_eat = ft_atoi(argv[4]);
-	else
-		sim->number_of_times_to_eat = -1;
-	if (!init_forks(sim))
-		return (0);
-	return (1);
+	start = get_current_time();
+	while (get_current_time() < time + start)
+	{
+		if (!*philo->is_alive)
+			break ;
+		usleep(80);
+	}
 }
 
-t_philo	*create_philosophers(t_sim *sim, int *finish)
+void	print(char *message, t_philo *philo)
 {
-	t_philo	*philos;
-	int		i;
-	long	current_time;
-
-	i = 0;
-	current_time = get_current_time();
-	philos = malloc(sizeof(t_philo) * sim->number_of_philos);
-	if (!philos)
-		return (0);
-	while (i < sim->number_of_philos)
+	pthread_mutex_lock(&philo->sim->eat);
+	if (*philo->is_alive)
 	{
-		philos[i].id = i;
-		philos[i].is_alive = finish;
-		philos[i].is_full = 0;
-		philos[i].meal_counter = 0;
-		philos[i].current_time = current_time;
-		philos[i].last_meal = current_time;
-		philos[i].left_fork = &sim->forks[i];
-		philos[i].right_fork = &sim->forks[(i + 1) % sim->number_of_philos];
-		philos[i].sim = sim;
-		i++;
+		printf("%ld %d %s\n",
+			get_current_time() - philo->current_time,
+			philo->id + 1, message);
 	}
-	return (philos);
+	pthread_mutex_unlock(&philo->sim->print);
 }
