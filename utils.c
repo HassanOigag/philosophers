@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:20:45 by hoigag            #+#    #+#             */
-/*   Updated: 2023/04/29 17:36:08 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/02 19:57:40 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,15 @@ long	get_current_time(void)
 void	philo_sleep(t_philo	*philo, long time)
 {
 	long	start;
+	int		is_not_alive;
 
+	pthread_mutex_lock(&philo->sim->print);
+	is_not_alive = !*philo->is_alive;
+	pthread_mutex_unlock(&philo->sim->print);
 	start = get_current_time();
 	while (get_current_time() < time + start)
 	{
-		if (!*philo->is_alive)
+		if (is_not_alive)
 			break ;
 		usleep(80);
 	}
@@ -83,7 +87,7 @@ void	philo_sleep(t_philo	*philo, long time)
 
 void	print(char *message, t_philo *philo)
 {
-	pthread_mutex_lock(&philo->sim->eat);
+	pthread_mutex_lock(&philo->sim->print);
 	if (*philo->is_alive)
 	{
 		printf("%ld %d %s\n",

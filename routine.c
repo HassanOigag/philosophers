@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 16:21:24 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/01 15:44:39 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/02 19:59:22 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,13 @@
 void	*routine(void *data)
 {
 	t_philo			*philo;
+	int				stop;
 
 	philo = (t_philo *) data;
 	if (philo->id % 2 != 0)
 		usleep(10000);
-	while (*philo->is_alive && !philo->is_full)
+	stop = 1;
+	while (stop)
 	{
 		print("is thinking", philo);
 		pthread_mutex_lock(philo->left_fork);
@@ -27,17 +29,24 @@ void	*routine(void *data)
 		pthread_mutex_lock(philo->right_fork);
 		print("has taken a fork", philo);
 		print("is eating", philo);
-		pthread_mutex_lock(&philo->sim->eat);
+		pthread_mutex_lock(&philo->sim->print);
 		philo->last_meal = get_current_time();
-		pthread_mutex_unlock(&philo->sim->eat);
+		pthread_mutex_unlock(&philo->sim->print);
 		philo->meal_counter++;
 		if (philo->meal_counter == philo->sim->number_of_times_to_eat)
+		{
+			pthread_mutex_lock(&philo->sim->print);
 			philo->is_full = 1;
+			pthread_mutex_unlock(&philo->sim->print);
+		}
 		philo_sleep(philo, philo->sim->time_to_eat);
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		print("is sleeping", philo);
 		philo_sleep(philo, philo->sim->time_to_sleep);
+		pthread_mutex_lock(&philo->sim->print);
+		stop = *philo->is_alive && !philo->is_full;
+		pthread_mutex_unlock(&philo->sim->print);
 	}
 	return (0);
 }
@@ -51,8 +60,10 @@ static int	check_full(t_sim *sim)
 	counter = 0;
 	while (i < sim->number_of_philos)
 	{
+		pthread_mutex_lock(&sim->print);
 		if (sim->philosophers[i].is_full)
 			counter++;
+		pthread_mutex_unlock(&sim->print);
 		i++;
 	}
 	return (counter == sim->number_of_philos);
@@ -60,7 +71,12 @@ static int	check_full(t_sim *sim)
 
 static int	check_death(t_philo *philo, int *finish)
 {
-	if (get_current_time() - philo->last_meal > philo->sim->time_to_die)
+	long	period;
+
+	pthread_mutex_lock(&philo->sim->print);
+	period = get_current_time() - philo->last_meal;
+	pthread_mutex_unlock(&philo->sim->print);
+	if (period > philo->sim->time_to_die)
 	{
 		*finish = 0;
 		pthread_mutex_lock(&philo->sim->print);

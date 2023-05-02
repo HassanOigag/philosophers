@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 16:17:12 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/01 15:44:03 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/02 19:47:18 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static int	init_forks(t_sim *sim)
 
 	i = 0;
 	if (pthread_mutex_init(&sim->print, 0) != 0
-		&& pthread_mutex_init(&sim->eat, 0) != 0)
+		|| pthread_mutex_init(&sim->race, 0) != 0)
 	{
 		printf("Could not init mutex\n");
 		return (0);

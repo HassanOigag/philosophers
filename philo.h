@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:00:01 by hoigag            #+#    #+#             */
-/*   Updated: 2023/04/29 10:55:57 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/02 19:34:28 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ typedef struct s_sim
 	long			time_to_sleep;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print;
+	pthread_mutex_t	race;
 	t_philo			*philosophers;
 	pthread_t		*philo_threads;
-	pthread_mutex_t	eat;
 }	t_sim;
 
 typedef struct s_philo
