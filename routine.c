@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 16:21:24 by hoigag            #+#    #+#             */
-/*   Updated: 2023/04/29 17:36:51 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/01 15:44:39 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@ void	*routine(void *data)
 		pthread_mutex_lock(philo->right_fork);
 		print("has taken a fork", philo);
 		print("is eating", philo);
+		pthread_mutex_lock(&philo->sim->eat);
 		philo->last_meal = get_current_time();
+		pthread_mutex_unlock(&philo->sim->eat);
 		philo->meal_counter++;
 		if (philo->meal_counter == philo->sim->number_of_times_to_eat)
 			philo->is_full = 1;
@@ -70,7 +72,6 @@ static int	check_death(t_philo *philo, int *finish)
 			pthread_mutex_unlock(philo->left_fork);
 		return (1);
 	}
-	pthread_mutex_unlock(&philo->sim->eat);
 	return (0);
 }
 
