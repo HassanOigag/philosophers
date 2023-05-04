@@ -6,11 +6,27 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 16:21:24 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/02 19:59:22 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/04 15:22:30 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void static	eat(t_philo *philo)
+{
+	print("is eating", philo);
+	pthread_mutex_lock(&philo->sim->print);
+	philo->last_meal = get_current_time();
+	pthread_mutex_unlock(&philo->sim->print);
+	philo->meal_counter++;
+	if (philo->meal_counter == philo->sim->number_of_times_to_eat)
+	{
+		pthread_mutex_lock(&philo->sim->print);
+		philo->is_full = 1;
+		pthread_mutex_unlock(&philo->sim->print);
+	}
+	philo_sleep(philo, philo->sim->time_to_eat);
+}
 
 void	*routine(void *data)
 {
@@ -28,30 +44,19 @@ void	*routine(void *data)
 		print("has taken a fork", philo);
 		pthread_mutex_lock(philo->right_fork);
 		print("has taken a fork", philo);
-		print("is eating", philo);
-		pthread_mutex_lock(&philo->sim->print);
-		philo->last_meal = get_current_time();
-		pthread_mutex_unlock(&philo->sim->print);
-		philo->meal_counter++;
-		if (philo->meal_counter == philo->sim->number_of_times_to_eat)
-		{
-			pthread_mutex_lock(&philo->sim->print);
-			philo->is_full = 1;
-			pthread_mutex_unlock(&philo->sim->print);
-		}
-		philo_sleep(philo, philo->sim->time_to_eat);
+		eat(philo);
 		pthread_mutex_unlock(philo->right_fork);
 		pthread_mutex_unlock(philo->left_fork);
 		print("is sleeping", philo);
 		philo_sleep(philo, philo->sim->time_to_sleep);
 		pthread_mutex_lock(&philo->sim->print);
-		stop = *philo->is_alive && !philo->is_full;
+		stop = ((*philo->is_alive) && (!philo->is_full));
 		pthread_mutex_unlock(&philo->sim->print);
 	}
 	return (0);
 }
 
-static int	check_full(t_sim *sim)
+int	check_full(t_sim *sim)
 {
 	int	i;
 	int	counter;
@@ -69,7 +74,7 @@ static int	check_full(t_sim *sim)
 	return (counter == sim->number_of_philos);
 }
 
-static int	check_death(t_philo *philo, int *finish)
+int	check_death(t_philo *philo, int *finish)
 {
 	long	period;
 
@@ -88,23 +93,6 @@ static int	check_death(t_philo *philo, int *finish)
 			pthread_mutex_unlock(philo->left_fork);
 		return (1);
 	}
-	return (0);
-}
-
-int	monitor(t_sim *sim, int *finish)
-{
-	int	i;
-
-	i = 0;
-	if (sim->number_of_times_to_eat > 0)
-	{
-		if (check_full(sim))
-			return (1);
-	}
-	if (check_death(&sim->philosophers[i], finish))
-		return (1);
-	i++;
-	i = i % sim->number_of_philos;
 	return (0);
 }
 

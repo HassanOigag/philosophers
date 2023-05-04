@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:00:01 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/02 19:34:28 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/04 14:48:55 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct s_sim
 	long			time_to_sleep;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print;
-	pthread_mutex_t	race;
+	pthread_mutex_t	last_meal;
 	t_philo			*philosophers;
 	pthread_t		*philo_threads;
 }	t_sim;
@@ -61,5 +61,7 @@ void	*routine(void *data);
 int		monitor(t_sim *sim, int *finish);
 int		destroy_mutexes(t_sim *sim);
 int		join_and_free(t_sim *sim);
+int		check_death(t_philo *philo, int *finish);
+int		check_full(t_sim *sim);
 
 #endif

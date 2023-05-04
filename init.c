@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 16:17:12 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/02 19:47:18 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/04 15:01:21 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static int	init_forks(t_sim *sim)
 
 	i = 0;
 	if (pthread_mutex_init(&sim->print, 0) != 0
-		|| pthread_mutex_init(&sim->race, 0) != 0)
+		|| pthread_mutex_init(&sim->last_meal, 0) != 0)
 	{
 		printf("Could not init mutex\n");
 		return (0);
@@ -89,9 +89,6 @@ static int	create_philo_threads(t_sim *sim)
 
 int	init_sim(t_sim *sim, char **argv, int argc, int *finish)
 {
-	int	i;
-
-	i = 0;
 	sim->number_of_philos = ft_atoi(argv[0]);
 	sim->time_to_die = ft_atoi(argv[1]);
 	sim->time_to_eat = ft_atoi(argv[2]);
@@ -130,7 +127,8 @@ int	destroy_mutexes(t_sim *sim)
 		}
 		i++;
 	}
-	if (pthread_mutex_destroy(&sim->print) != 0)
+	if (pthread_mutex_destroy(&sim->print) != 0
+		|| pthread_mutex_destroy(&sim->last_meal) != 0)
 	{
 		printf("could not destroy the print mutex\n");
 		return (0);
