@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS =  -Wall -Werror -Wextra -pthread #-fsanitize=thread
+CFLAGS =  -Wall -Werror -Wextra -pthread
 NAME = philo
 SRCS = main.c utils.c init.c routine.c
 OBJS = $(SRCS:.c=.o)
@@ -16,3 +16,5 @@ fclean: clean
 	rm -f $(NAME)
 
 re: clean all
+
+.PHONY: clean fclean re all
