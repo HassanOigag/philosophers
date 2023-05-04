@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:09:42 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/03 15:45:54 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/04 14:39:09 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@ int	main(int argc, char **argv)
 			break ;
 	}
 	if (!join_and_free(&sim))
+	{
+		free(sim.forks);
+		free(sim.philosophers);
+		free(sim.philo_threads);
 		return (ERROR);
+	}
 	return (0);
 }
