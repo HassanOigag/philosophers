@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:09:42 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/04 14:39:09 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/06 20:18:10 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,22 @@ int	monitor(t_sim *sim, int *finish)
 	int	i;
 
 	i = 0;
-	if (sim->number_of_times_to_eat > 0)
+	while (i < sim->number_of_philos)
 	{
-		if (check_full(sim))
+		if (check_death(&sim->philosophers[i], finish))
 			return (1);
+		if (sim->number_of_times_to_eat > 0)
+		{
+			if (check_full(sim))
+			{
+				pthread_mutex_lock(&sim->print);
+				*finish = 0;
+				pthread_mutex_unlock(&sim->print);
+				return (1);
+			}
+		}
+		i++;
 	}
-	if (check_death(&sim->philosophers[i], finish))
-		return (1);
-	i++;
-	i = i % sim->number_of_philos;
 	return (0);
 }
 

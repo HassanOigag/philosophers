@@ -1,5 +1,5 @@
-CC = clang
-CFLAGS =  -Wall -Werror -Wextra -pthread
+CC = cc
+CFLAGS =  -Wall -Werror -Wextra -fsanitize=thread
 NAME = philo
 SRCS = main.c utils.c init.c routine.c
 OBJS = $(SRCS:.c=.o)

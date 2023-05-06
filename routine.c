@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 16:21:24 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/04 14:38:37 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/06 19:45:06 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void static	eat(t_philo *philo)
 	philo->last_meal = get_current_time();
 	pthread_mutex_unlock(&philo->sim->print);
 	philo->meal_counter++;
-	if (philo->meal_counter == philo->sim->number_of_times_to_eat)
+	if (philo->meal_counter >= philo->sim->number_of_times_to_eat)
 	{
 		pthread_mutex_lock(&philo->sim->print);
 		philo->is_full = 1;
@@ -35,7 +35,7 @@ void	*routine(void *data)
 
 	philo = (t_philo *) data;
 	if (philo->id % 2 != 0)
-		usleep(10000);
+		usleep(500);
 	stop = 1;
 	while (stop)
 	{
@@ -50,7 +50,7 @@ void	*routine(void *data)
 		print("is sleeping", philo);
 		philo_sleep(philo, philo->sim->time_to_sleep);
 		pthread_mutex_lock(&philo->sim->print);
-		stop = ((*philo->is_alive) && (!philo->is_full));
+		stop = ((*philo->is_alive));
 		pthread_mutex_unlock(&philo->sim->print);
 	}
 	return (0);
@@ -83,7 +83,9 @@ int	check_death(t_philo *philo, int *finish)
 	pthread_mutex_unlock(&philo->sim->print);
 	if (period > philo->sim->time_to_die)
 	{
+		pthread_mutex_lock(&philo->sim->print);
 		*finish = 0;
+		pthread_mutex_unlock(&philo->sim->print);
 		pthread_mutex_lock(&philo->sim->print);
 		printf("%ld %d %s\n",
 			get_current_time() - philo->current_time,

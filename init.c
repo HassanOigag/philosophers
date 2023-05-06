@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/28 16:17:12 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/04 15:01:21 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/06 19:44:06 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,7 @@ static int	init_forks(t_sim *sim)
 	int	i;
 
 	i = 0;
-	if (pthread_mutex_init(&sim->print, 0) != 0
-		|| pthread_mutex_init(&sim->last_meal, 0) != 0)
+	if (pthread_mutex_init(&sim->print, 0) != 0)
 	{
 		printf("Could not init mutex\n");
 		return (0);
@@ -94,7 +93,7 @@ int	init_sim(t_sim *sim, char **argv, int argc, int *finish)
 	sim->time_to_eat = ft_atoi(argv[2]);
 	sim->time_to_sleep = ft_atoi(argv[3]);
 	if (argc == 5)
-		sim->number_of_times_to_eat = ft_atoi(argv[4]);
+		sim->number_of_times_to_eat = ft_atoi(argv[4]) + 1;
 	else
 		sim->number_of_times_to_eat = -1;
 	if (!init_forks(sim))
@@ -127,8 +126,7 @@ int	destroy_mutexes(t_sim *sim)
 		}
 		i++;
 	}
-	if (pthread_mutex_destroy(&sim->print) != 0
-		|| pthread_mutex_destroy(&sim->last_meal) != 0)
+	if (pthread_mutex_destroy(&sim->print) != 0)
 	{
 		printf("could not destroy the print mutex\n");
 		return (0);

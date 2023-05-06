@@ -6,7 +6,7 @@
 /*   By: hoigag <hoigag@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/19 16:00:01 by hoigag            #+#    #+#             */
-/*   Updated: 2023/05/04 14:48:55 by hoigag           ###   ########.fr       */
+/*   Updated: 2023/05/05 11:44:01 by hoigag           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 # include <limits.h>
 
 # define ERROR 1
+# define TRUE 2
+# define FALSE 0
 
 typedef struct s_philo	t_philo;
 
