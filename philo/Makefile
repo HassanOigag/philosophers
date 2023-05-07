@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS =  -Wall -Werror -Wextra -fsanitize=thread
+CFLAGS =  -Wall -Werror -Wextra 
 NAME = philo
 SRCS = main.c utils.c init.c routine.c
 OBJS = $(SRCS:.c=.o)
@@ -10,7 +10,7 @@ $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-	rm -f *.o
+	rm -f $(OBJS)
 
 fclean: clean
 	rm -f $(NAME)
