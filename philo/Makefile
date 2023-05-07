@@ -4,7 +4,11 @@ NAME = philo
 SRCS = main.c utils.c init.c routine.c
 OBJS = $(SRCS:.c=.o)
 
+%.o: %.c
+	$(CC) $(CFLAGS) -c $^
+
 all: $(NAME)
+
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
